@@ -9,7 +9,7 @@ const METHODS = {
 
 function handleError(error) {
     console.log('Handle Error', error);
-    throw new Error(`Request returned with error`);
+    throw new Error(`Request returned with error!!!`);
 };
 
 class HTTPTransport {
@@ -26,10 +26,6 @@ class HTTPTransport {
 
         if (!url.startsWith('http')) {
             result = 'https://' + url
-        }
-
-        if (!url.endsWith('/')) {
-            result = result + '/'
         }
 
         console.log('URL', result)
@@ -73,8 +69,10 @@ class HTTPTransport {
             const xhr = new XMLHttpRequest();
             xhr.open(method, url);
 
-            for (const [key, value] of Object.entries(headers)) {
-                xhr.setRequestHeader(key, value);
+            if (headers) {
+                for (const [key, value] of Object.entries(headers)) {
+                    xhr.setRequestHeader(key, value);
+                }
             }
 
             xhr.timeout = timeout;
@@ -87,12 +85,10 @@ class HTTPTransport {
             xhr.onerror = reject;
             xhr.ontimeout = reject;
 
-            // xhr.
-
             if (method === METHODS.GET || !data) {
                 xhr.send();
             } else {
-                xhr.send(data);
+                xhr.send(JSON.stringify(data));
             }
         })
         .then(function (xhr) {
@@ -111,9 +107,44 @@ class HTTPTransport {
     };
 }
 
-const getStarships = await new HTTPTransport().get('swapi.dev/api/starships', {
-    headers: { 'Content-Type': 'application/json' },
-    data: { search: ['star'], page: 2 },
+/** TESTS */
+
+// const getStarships = await new HTTPTransport().get('swapi.dev/api/starships', {
+//     headers: { 'Content-Type': 'application/json' },
+//     data: { search: ['star'], page: 2 },
+//     timeout: 2000
+// });
+// console.log('GET Starships RES:', getStarships);
+
+// const deletePosts = await new HTTPTransport().delete('jsonplaceholder.typicode.com/posts/100', {
+//     timeout: 2000
+// });
+// console.log('DELETE Posts RES:', deletePosts);
+
+// const addPost = await new HTTPTransport().post('jsonplaceholder.typicode.com/posts', {
+//     headers: { 'Content-type': 'application/json; charset=UTF-8' },
+//     data: {
+//         userId: 2,
+//         body: 'Some post create!',
+//         title: 'Post from UserID: 2'
+//     },
+//     timeout: 2000
+// });
+// console.log('POST Posts RES:', addPost);
+
+// const getPosts = await new HTTPTransport().get('jsonplaceholder.typicode.com/posts/100', {
+//     timeout: 2000
+// });
+// console.log('GET Posts RES:', getPosts);
+
+const updatePosts = await new HTTPTransport().put('jsonplaceholder.typicode.com/posts/1', {
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+    data: {
+        id: 1,
+        title: 'foo',
+        body: 'bar',
+        userId: 1,
+    },
     timeout: 2000
 });
-console.log('GET Starships RES:', getStarships);
+console.log('PUT Posts RES:', updatePosts);
